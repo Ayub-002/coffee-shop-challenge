@@ -1,8 +1,9 @@
-from order import Order
+from lib.order import Order
 
 class Customer:
     def __init__(self, name):
         self.name = name
+        self._orders = []
 
     @property
     def name(self):
@@ -16,32 +17,30 @@ class Customer:
             raise ValueError("Name must be a string between 1 and 15 characters.")
 
     def orders(self):
-        return [order for order in Order.all() if order.customer == self]
+        return self._orders
 
     def coffees(self):
-        return list({order.coffee for order in self.orders()})
+        return list({order.coffee for order in self._orders})
 
     def create_order(self, coffee, price):
-        return Order(self, coffee, price)
-    
+        Order(self, coffee, price)
+
     @classmethod
     def most_aficionado(cls, coffee):
-        from order import Order
-        from coffee import Coffee
+        from lib.order import Order
+        from lib.coffee import Coffee
 
-        
         if not isinstance(coffee, Coffee):
-           raise TypeError("Argument must be a Coffee instance.")
+            raise TypeError("Argument must be a Coffee instance.")
 
         spending = {}
 
         for order in Order.all():
             if order.coffee == coffee:
-               cust = order.customer
-               spending[cust] = spending.get(cust, 0) + order.price
+                cust = order.customer
+                spending[cust] = spending.get(cust, 0) + order.price
 
         if not spending:
-           return None
+            return None
 
         return max(spending, key=spending.get)
-
